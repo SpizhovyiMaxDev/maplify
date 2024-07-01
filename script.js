@@ -78,7 +78,6 @@ class App {
   #currentWorkout = {
     data: null,
     workoutIndex: null,
-    circle: null,
   };
   
   #userCoords;
@@ -348,8 +347,6 @@ class App {
 
       } else {
 
-        this.#map.removeLayer(this.#currentWorkout.circle)
-
         this._removeCurrentWorkoutAnimation();
 
         this._scrollToMarker(this.#userCoords);
@@ -382,23 +379,29 @@ class App {
     workoutEl.classList.add('current--workout');
     
     this._animateCircle(workout);
-    // this._animateLineRoute(workout);
+    this._animateLineRoute(workout);
   }
 
   _arrNotIncludes(arr, id){
     return arr.every(el => el.id !== id);
   }
 
-  _setUpCircle(workout){
-    this.#currentWorkout.circle = L.circle(workout.coords, {
+  _animateCircle(workout){
+    const circle = L.circle(workout.coords, {
       radius: 120,
       color: 'red',
       fillOpacity:0.2
      });
-  }
 
-  _Circle(){
-    this.#currentWorkout.circle.addTo(this.#map);
+     circle.id = workout.id;
+
+    if(this._arrNotIncludes(this.#circles, workout.id)){
+      this.#circles.push(circle);
+    }
+
+    this.#circles.forEach(circle => {
+      circle.id === workout.id ? circle.addTo(this.#map) : this.#map.removeLayer(circle)
+    });
   }
 
 
