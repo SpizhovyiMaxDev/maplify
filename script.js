@@ -18,7 +18,6 @@ class Workout {
       months[this.date.getMonth()]
     } ${this.date.getDate()}`;
   }
-
 }
 
 class Running extends Workout {
@@ -79,6 +78,7 @@ class App {
   #currentWorkout = {
     data: null,
     workoutIndex: null,
+    circle: null,
   };
   
   #userCoords;
@@ -348,6 +348,8 @@ class App {
 
       } else {
 
+        this.#map.removeLayer(this.#currentWorkout.circle)
+
         this._removeCurrentWorkoutAnimation();
 
         this._scrollToMarker(this.#userCoords);
@@ -387,22 +389,16 @@ class App {
     return arr.every(el => el.id !== id);
   }
 
-  _animateCircle(workout){
-    const circle = L.circle(workout.coords, {
+  _setUpCircle(workout){
+    this.#currentWorkout.circle = L.circle(workout.coords, {
       radius: 120,
       color: 'red',
       fillOpacity:0.2
      });
+  }
 
-     circle.id = workout.id;
-
-    if(this._arrNotIncludes(this.#circles, workout.id)){
-      this.#circles.push(circle);
-    }
-
-    this.#circles.forEach(circle => {
-      circle.id === workout.id ? circle.addTo(this.#map) : this.#map.removeLayer(circle)
-    });
+  _Circle(){
+    this.#currentWorkout.circle.addTo(this.#map);
   }
 
 
@@ -544,7 +540,7 @@ class App {
     this._clearMap("removeRoute", this.#currentWorkout.data);
 
     this._resetCurrentWorkout();
-  }
+}
 
   _deleteCurrentWorkoutView(){
     const workoutElement = document.querySelector(`.workout[data-id="${this.#currentWorkout.data.id}"]`);
@@ -554,7 +550,7 @@ class App {
     this._setWorkoutsToLocalStorage();
   }
 
-  // Reste Workout Parameters
+  // Reste Workout
   _resetCurrentWorkout(){
     this.#currentWorkout = {
       data: null,
