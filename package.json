@@ -1,0 +1,18 @@
+{
+  "name": "mapty-js",
+  "version": "1.0.0",
+  "description": "",
+  "default": "script.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "Max Spizhovyi",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  },
+  "dependencies": {
+    "@parcel/source-map": "^2.1.1"
+  }
+}
