@@ -81,6 +81,8 @@ class App {
   };
   
   #userCoords;
+
+  
   #circles = [];
   #routes = [];
   #markers = [];
@@ -249,7 +251,6 @@ class App {
   }
 
   _renderWorkoutMarker(workout) {
-    
     const marker = L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
@@ -504,33 +505,26 @@ class App {
 
    // Sort workouts
    _setSortedWorkouts(e){
-     let sortBy = e.target.value;
-     this._sortWorkouts(sortBy);
+     let option = e.target.value;
+     this._sortWorkouts(option);
    }
 
 
-    _sortWorkouts(sortBy){
-      document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));  
-      
-      let sorted = [];
-  
-      if(sortBy === "Sort By Default"){
-        sorted = this.#workouts;
-      }
-  
-      if(sortBy === "Sort By Lowest Distance"){
-        sorted = this.#workouts.slice().sort((a, b) => b.distance  -  a.distance)
-      }
-  
-      if(sortBy === "By Highest Distance"){
-        sorted = this.#workouts.slice().sort((a, b) => a.distance  -  b.distance)
-      }
-  
-       sorted.forEach(work => {
-        this._renderWorkout(work);
-       })
+   _sortWorkouts(option){
+    document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));  
+    
+    const sortOpitions = {
+      "Sort By Default": this.#workouts,
+      "Sort By Lowest Distance": this.#workouts.slice().sort((a, b) => b.distance  -  a.distance),
+      "By Highest Distance": this.#workouts.slice().sort((a, b) => a.distance  -  b.distance),
     }
-  
+
+    let sorted = sortOpitions[option];
+
+     sorted.forEach(work => {
+      this._renderWorkout(work);
+     })
+  }
 
    // Delete current workout
   _deleteCurrentWorkout() {
@@ -564,10 +558,6 @@ class App {
   /* Storage Methods */
   _setWorkoutsToLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
-  }
-
-  _setCurrentWorkoutToLocalStorage(){
-    localStorage.setItem('current-workout', JSON.stringify(this.#currentWorkout))
   }
 
   _getWorkoutsLocalStorage() {
