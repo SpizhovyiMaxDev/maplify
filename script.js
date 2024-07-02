@@ -433,9 +433,9 @@ class App {
   }
 
   _deleteAllWorkouts(){
-    document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));
-
+    this._removeCurrentWorkoutAnimation();
     this._clearMap("entireMap");
+    
     this.#workouts = [];
     this._setWorkoutsToLocalStorage();
   }
