@@ -24,18 +24,14 @@
   
   body {
     font-family: 'Manrope', sans-serif;
-    color: var(--color-light--2);
-    font-weight: 400;
-    line-height: 1.6;
-    height: 100vh;
-    overscroll-behavior-y: none;
-    position: relative;
-    background-color: #fff;
-    /* padding: 2.5rem; */
-  
-    display: flex;
+    font-size: 1.8rem;
   }
   
+  .layout{ 
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+  }
+
   /* GENERAL */
   a:link,
   a:visited {
@@ -44,48 +40,80 @@
   
   /* SIDEBAR */
   .sidebar {
-    flex-basis: 50rem;
     background-color: var(--color-dark--1);
-    padding: 3rem 2.5rem 4rem 2.5rem;
+    padding: 6.4rem 2rem;
+    height: 100vh;
+  }
+  
+  .logotype {
+    font-size: 5.6rem;
+    text-align: center;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    color: var(--color-light--2);
     display: flex;
-    flex-direction: column;
-    position: relative;
+    gap: 1rem;
+    align-items:center;
+    justify-content: center;
+    margin-bottom: 6rem;
   }
-  
-  .logo {
-    height: 4.4rem;
-    align-self: center;
-    margin-bottom: 3rem;
+
+  .img-logo{
+    width: 5rem;
   }
-  
-  
   
   .sidebar__buttons{
-    margin-bottom: 29px;
-    display: flex;
-    flex-wrap: wrap;
-    gap:1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 4rem;
   }
   
-  .sidebar__button{
-    padding: 1rem 2rem;
-    font-size: 1.6rem;
-    
-  }
-  
-  
-  .workouts::-webkit-scrollbar {
-    width: 0;
-  }
-  
+  .sidebar__button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, #1e8c7f, #188e74, #18856d, #1b6e59);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+    outline: none; /* Remove default focus outline */
+    z-index: 100;
+}
+
+.sidebar__button:hover {
+    background: linear-gradient(135deg, #1b786a, #166e61, #16685b, #195246); /* Darker shades on hover */
+}
+
+
+/* Style the scrollbar for WebKit browsers (Chrome, Safari) */
+.workouts::-webkit-scrollbar {
+  width: 1rem; /* Adjust width to be a bit thicker */
+}
+
+/* Track */
+.workouts::-webkit-scrollbar-track {
+  background: var(--color-dark--2); /* Use a dark background color */
+  border-radius: 10px; /* Round the corners */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3); /* Add inner shadow for depth */
+}
+
   .workouts {
+    max-height: 40rem;
+    padding: 0 1rem;
     list-style: none;
-    height: 80vh;
     overflow-y: scroll;
-    overflow-x: hidden;
   }
 
   .workout {
+    color: var(--color-light--2);
     background-color: var(--color-dark--2);
     border-radius: 5px;
     padding: 1.5rem 2.25rem;
@@ -93,7 +121,7 @@
     cursor: pointer;
   
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.75rem 1.5rem;
   }
 
@@ -110,8 +138,9 @@
   }
 
   .workout__title {
-    font-size: 1.7rem;
-    font-weight: 600;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
     grid-column: 1 / -1;
   }
   
@@ -127,12 +156,12 @@
   }
   
   .workout__value {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin-right: 0.5rem;
   }
   
   .workout__unit {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     color: var(--color-light--1);
     text-transform: uppercase;
     font-weight: 800;
@@ -146,12 +175,11 @@
   
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.5rem 2.5rem;
-  
-     align-items: center;
+    gap: 1rem 2.5rem;
+    color: var(--color-light--2);
+    align-items: center;
 
     /* Match height and activity boxes */
-    height: 11rem;
     transition: all 0.5s, transform 1ms;
   }
   
@@ -175,6 +203,7 @@
   .form__row {
     display: flex;
     align-items: center;
+    gap: 1rem;
   }
   
   .form__row--hidden {
@@ -182,16 +211,17 @@
   }
   
   .form__label {
-    flex: 0 0 50%;
+    flex: 1;
     font-size: 1.5rem;
     font-weight: 600;
   }
   
   .form__input {
+    flex: 1.5;
     width: 100%;
     padding: 0.3rem 1.1rem;
     font-family: inherit;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     border: none;
     border-radius: 3px;
     background-color: var(--color-light--3);
@@ -203,23 +233,23 @@
     background-color: #fff;
   }
   
-  .form__btn--edit, .form__btn--add{
-    /* display: none; */
-    margin: 10px 0 20px;
-    width:40%;
-    height: 40%;
-    color: #fff;
-    background-color: #42484d;
-    border-top:1px solid rgb(160, 159, 159);
-    border-right:0.3px solid white;
-    border-bottom: 4px solid black;
-    border-left: 4px solid rgb(42, 40, 40);
-    letter-spacing: 2px;
-    font-style: oblique;
-    font-weight: 200;
-    text-shadow:  2px 2px 2px black;
+  .form__btn {
+    font-size: 1.8rem; /* Increased font size for better readability */
+    padding: 1.2rem 2rem; /* Increased padding for a larger button */
+    margin: 1.5rem 0;
+    background: linear-gradient(135deg, #ffb545, #ff9f00); /* Gradient background */
+    color: var(--color-dark--1);
+    border-radius: 5px; /* Slightly larger border radius */
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a 3D effect */
+    transition: all 0.3s ease; /* Smooth transition effect */
   }
-
+  
+  .form__btn:hover {
+    background: linear-gradient(135deg, #ff9f00, #e68a00); /* Darker gradient on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Slightly larger shadow on hover */
+  }
 
   .tips{
     text-align: center;
@@ -252,9 +282,9 @@
   
   /* MAP */
   #map {
-    flex: 1;
-    height: 100%;
     background-color: var(--color-light--1);
+    width: 100%;
+    height: 100vh;
   }
   
   /* Popup width is defined in JS using options */
@@ -318,4 +348,70 @@
 .link:visited{
   color:#ffb545;
   font-size: 1.4rem;
+}
+
+@media (max-width:110em) {
+  html{
+    font-size: 50%;
+  }
+
+  .form__btn--add{
+    margin: 3rem 0 0;
+  }
+  
+  .layout {
+    grid-template-columns: 1fr 2fr;
+  }
+
+  .sidebar__buttons{
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form{
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+
+  .form__btn{
+    font-size: 1.8rem;
+    padding: 1rem;
+  }
+
+  .form{
+    font-size: 1.8rem;
+  }
+
+  .form__label{
+    flex:1 1 20%;
+  }
+
+  .form__input{
+    flex:3 1 80%;
+    padding: 1rem 2rem;
+  }
+}
+
+@media (max-width:60em){
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    height: auto;
+    padding: 4rem 2rem;
+    order: 1;
+  }
+  
+  #map{
+    order: 0;
+    height: 85vh;
+  }
+}
+
+
+@media (max-width:30em){
+  html{
+    font-size: 40%;
+  }
 }

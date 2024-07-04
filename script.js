@@ -68,25 +68,26 @@ const btnShowUserPosition = document.querySelector('.sidebar__button--my-positio
 const btnSortWorkouts = document.querySelector('.sidebar__button--sort-distance');
 const btnDeleteWorkout = document.querySelector('.sidebar__button--delete-workout');
 const btnDeleteAllWorkouts = document.querySelector('.sidebar__button--delete-all');
+const btnCloseForm = document.querySelector('.form__btn--close');
+
 
 class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
-
-  #currentWorkout = {
-    data: null,
-    workoutIndex: null,
-  };
-  
-  #userCoords;
-
-  
   #circles = [];
   #routes = [];
   #markers = [];
+  #userCoords;
 
+
+  #currentWorkout = {
+    workout:null,
+    workoutIndex: null,
+    mapEventsIndex:null,
+  };
+  
   constructor() {
     // Get user's position
     this._getPosition();
@@ -94,13 +95,11 @@ class App {
     // Get data from local storage
     this._getWorkoutsLocalStorage();
 
+
     // Attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
-
-    // Close workout editor
-    document.addEventListener('keydown', this._closeEditForm.bind(this));
 
     // Delete all workouts
     btnDeleteAllWorkouts.addEventListener('click', this._deleteAllWorkouts.bind(this));
@@ -116,6 +115,9 @@ class App {
 
     // Show all workouts on a map 
     btnShowAllWorkouts.addEventListener('click', this._showAllWorkouts.bind(this));
+  
+    //Close the form 
+    btnCloseForm.addEventListener('click', this._hideFormManually.bind(this));
   }
 
   _getPosition() {
@@ -177,6 +179,13 @@ class App {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
     inputDistance.focus();
+
+    window.innerWidth <= 958 && form.scrollIntoView({behavior:"smooth"})
+  }
+
+  _hideFormManually(e){
+    e.preventDefault();
+    this._hideForm();
   }
 
   _hideForm() {
@@ -200,18 +209,16 @@ class App {
 
     e.preventDefault();
 
-    // Get data from form
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
 
-    // If workout running, create running object
+  
     if (type === 'running') {
       const cadence = +inputCadence.value;
 
-      // Check if data is valid
       if(!validInputs(cadence, distance, duration)){
         return alert('Check if cadance, distance, duration are numbers!')
       }else if(!allPositive(distance, duration)){
@@ -221,7 +228,7 @@ class App {
       workout = new Running([lat, lng], distance, duration, cadence);
     }
 
-    // If workout cycling, create cycling object
+
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
 
@@ -272,9 +279,10 @@ class App {
     this.#markers.push(marker);
   }
 
+
   _renderWorkout(workout) {
     let html = `
-      <li class="workout workout--${workout.type} ${this.#currentWorkout?.data?.id === workout.id ? "current--workout" : ""}" data-id="${workout.id}">
+      <li class="workout workout--${workout.type} ${this.#currentWorkout.workout?.id === workout.id ? "current--workout" : ""}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
         <div class="workout__details">
           <span class="workout__icon">${
@@ -326,39 +334,41 @@ class App {
   _moveToPopup(e) {
     if (!this.#map) return;
     const workoutEl = e.target.closest('.workout');
-    if (workoutEl){   
-      const workoutIndex = this.#workouts.findIndex(
-        work => work.id === workoutEl.dataset.id
+
+    if (!workoutEl)return;
+
+    const workoutIndex = this.#workouts.findIndex(
+      work => work.id === workoutEl.dataset.id
+    );
+
+    const workout = this.#workouts[workoutIndex];
+    if (!workout) return;
+
+    if (workout.id !== this.#currentWorkout.workout?.id) {
+
+      this._animateCurrentWorkout(workoutEl, workout);
+
+      const mapEventsIndex = this.#circles.findIndex(
+        entity => entity.id === workout.id
       );
-    
-      const workout = this.#workouts[workoutIndex];
-    
-      if (!workout) return;
 
-      if (workout.id !== this.#currentWorkout.data?.id) {
+      this.#currentWorkout = {
+        workout,
+        workoutIndex,
+        mapEventsIndex,
+      };
 
-        this.#currentWorkout = {
-          data: workout,
-          workoutIndex,
-        };
-        
-        this._animateCurrentWorkout(workoutEl, workout);
+      this._scrollToMarker(workout.coords);
 
-        this._scrollToMarker(workout.coords);
+    } else {
 
-      } else {
+      this._deleteCurrentWorkoutAnimation();
 
-        this._removeCurrentWorkoutAnimation();
+      this._scrollToMarker(this.#userCoords);
 
-        this._scrollToMarker(this.#userCoords);
+      this._clearMap("hideRoute");
 
-        this._clearMap("hideRoute", workout);
-
-        this.#currentWorkout = {
-          data: null,
-          workoutIndex: null,
-        };
-      }
+      this._resetCurrentWorkout();
     }
   }
 
@@ -371,19 +381,15 @@ class App {
     });
   }
 
-  _removeCurrentWorkoutAnimation(){
-    document.querySelectorAll('.workout').forEach(work => work.classList.remove('current--workout'));
-  }
-
   _animateCurrentWorkout(workoutEl, workout){
-    this._removeCurrentWorkoutAnimation();
+    this._deleteCurrentWorkoutAnimation();
     workoutEl.classList.add('current--workout');
     
     this._animateCircle(workout);
     this._animateLineRoute(workout);
   }
 
-  _arrNotIncludes(arr, id){
+  _arrNotIncludesId(arr, id){
     return arr.every(el => el.id !== id);
   }
 
@@ -396,7 +402,7 @@ class App {
 
      circle.id = workout.id;
 
-    if(this._arrNotIncludes(this.#circles, workout.id)){
+    if(this._arrNotIncludesId(this.#circles, workout.id)){
       this.#circles.push(circle);
     }
 
@@ -418,7 +424,7 @@ class App {
 
       route.id = workout.id;
 
-      if(this._arrNotIncludes(this.#routes, route.id)){
+      if(this._arrNotIncludesId(this.#routes, route.id)){
         this.#routes.push(route);
       }
 
@@ -433,63 +439,37 @@ class App {
      }
   }
 
-  _deleteAllWorkouts(){
-    this._removeCurrentWorkoutAnimation();
-    this._clearMap("entireMap");
-    
-    this.#workouts = [];
-    this._setWorkoutsToLocalStorage();
-  }
-
   // Clear map according to conditions
-  _clearMap(type = "entireMap", element=null){
-    if(element && type === "removeRoute") {
-      // Filter markers
-      this.#markers = this.#markers.filter(marker => {
-        if (marker.id === element.id) {
-          this.#map.removeLayer(marker);
-          return false;
-        } else {
-          return true;
-        }
-      });
+  _clearMap(type = ""){
+    if(type === "deleteRoute") {
+      this.#map.removeLayer(this.#markers[this.#currentWorkout.workoutIndex])
+      this._clearAnimationsFromTheMap();
       
-      // Filter Circles
-      this.#circles = this.#circles.filter(circle => {
-        if (circle.id === element.id) {
-          this.#map.removeLayer(circle);
-          return false;
-        } else {
-          return true;
-        }
-      });
-      
-      // Filter Routes
-      this.#routes = this.#routes.filter(route => {
-        if (route.id === element.id) {
-          route.remove();
-          return false;
-        } else {
-          return true;
-        }
-      });
+      this.#markers.splice(this.#currentWorkout.workoutIndex, 1);
+      this.#circles.splice(this.#currentWorkout.mapEventsIndex, 1);
+      this.#routes.splice(this.#currentWorkout.mapEventsIndex, 1);
     }
 
-    if(element && type === "hideRoute"){
-      this.#circles.map(circle => this.#map.removeLayer(circle));
-      this.#routes.map(line => line.remove());
+    if(type === "hideRoute"){
+      this._clearAnimationsFromTheMap();
     }
 
     if(type === "entireMap"){
       this.#markers.map(marker => this.#map.removeLayer(marker));
-      this.#circles.map(circle => this.#map.removeLayer(circle));
-      this.#routes.map(route => route?.remove());
-
+      
+      if(this.#currentWorkout.mapEventsIndex) { 
+        this.__clearRoutsFromTheMap();
+      }
 
       this.#circles = [];
       this.#markers = [];
       this.#routes = [];
     }
+  }
+
+  _clearAnimationsFromTheMap(){
+    this.#map.removeLayer(this.#circles[this.#currentWorkout.mapEventsIndex]);
+    this.#routes[this.#currentWorkout.mapEventsIndex].remove();
   }
 
   // This function responsible for setting up all of the workout markers
@@ -509,17 +489,19 @@ class App {
      this._sortWorkouts(option);
    }
 
-
    _sortWorkouts(option){
-    document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));  
+    this._deleteAllWorkoutsView();
     
     const sortOpitions = {
-      "Sort By Default": this.#workouts,
-      "Sort By Lowest Distance": this.#workouts.slice().sort((a, b) => b.distance  -  a.distance),
-      "By Highest Distance": this.#workouts.slice().sort((a, b) => a.distance  -  b.distance),
+      "Sort By Lowest Distance": (a, b) => b.distance  -  a.distance,
+      "By Highest Distance": (a, b) => a.distance  -  b.distance,
     }
 
-    let sorted = sortOpitions[option];
+    let sorted = 
+      option === "SortBy Default" ? 
+      this.#workouts : 
+      this.#workouts.toSorted(sortOpitions[option]);
+
 
      sorted.forEach(work => {
       this._renderWorkout(work);
@@ -532,34 +514,56 @@ class App {
 
     this._scrollToMarker(this.#userCoords);
 
-    this._deleteCurrentWorkoutView()
+    this._deleteCurrentWorkoutView(this.#currentWorkout.workout.id);
 
-    this._clearMap("removeRoute", this.#currentWorkout.data);
+    this._clearMap("deleteRoute");
 
     this._resetCurrentWorkout();
-}
+  }
 
-  _deleteCurrentWorkoutView(){
-    const workoutElement = document.querySelector(`.workout[data-id="${this.#currentWorkout.data.id}"]`);
+  _deleteCurrentWorkoutView(id){
+    const workoutElement = document.querySelector(`.workout[data-id="${id}"]`);
     containerWorkouts.removeChild(workoutElement);
 
     this.#workouts.splice(this.#currentWorkout.workoutIndex, 1);
     this._setWorkoutsToLocalStorage();
   }
 
-  // Reste Workout
+  // Delete All Workouts
+  _deleteAllWorkouts(){
+    this._scrollToUserPostion();
+    document.querySelectorAll(".workout").forEach(work => containerWorkouts.removeChild(work));
+    this._clearMap("entireMap");
+    
+    this.#workouts = [];
+    this._setWorkoutsToLocalStorage();
+  }
+
+  // Delete Current Workout Animation
+  _deleteCurrentWorkoutAnimation(){
+    document.querySelectorAll('.workout').forEach(work => work.classList.remove('current--workout'));
+  }
+
+  // Delete All workouts from the view
+  _deleteAllWorkoutsView(){
+    document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));
+  }
+
+  // Reset current workout
   _resetCurrentWorkout(){
     this.#currentWorkout = {
-      data: null,
+      workout: null,
       workoutIndex: null,
+      mapEventsIndex:null,
     };
   }
 
-  /* Storage Methods */
+  // Storage Workouts 
   _setWorkoutsToLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
 
+  // Get from storage workouts, and set them as a current once
   _getWorkoutsLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
@@ -571,7 +575,6 @@ class App {
       this._renderWorkout(work);
     });
   }
-
 }
 
 const app = new App();

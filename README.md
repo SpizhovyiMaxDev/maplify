@@ -1,4 +1,4 @@
-# Mapty JavaScript Project
+# Maplify JavaScript Project
 
 -------------⚙️ Mapty Features ----------------
 
