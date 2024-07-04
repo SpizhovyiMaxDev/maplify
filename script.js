@@ -95,7 +95,6 @@ class App {
     // Get data from local storage
     this._getWorkoutsLocalStorage();
 
-
     // Attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
@@ -170,9 +169,17 @@ class App {
       radius: 200,
       color: '#509825da',
       fillOpacity: 0.2
-     });
+    });
 
-     userCircle.addTo(this.#map)
+    userCircle.addTo(this.#map);
+  }
+
+  _hideFormManually(e){
+    e.preventDefault();
+    this._hideForm();
+
+    // Toggle the empty message guy
+    this.#workouts.length === 0 && this._toggleEmptyContainer();
   }
 
   _showForm(mapE) {
@@ -180,12 +187,12 @@ class App {
     form.classList.remove('hidden');
     inputDistance.focus();
 
-    window.innerWidth <= 958 && form.scrollIntoView({behavior:"smooth"})
-  }
 
-  _hideFormManually(e){
-    e.preventDefault();
-    this._hideForm();
+    // For the smaller screens scroller
+    window.innerWidth <= 958 && form.scrollIntoView({behavior:"smooth"})
+
+    // Toggle the empty message guy
+    this.#workouts.length === 0 && this._toggleEmptyContainer();
   }
 
   _hideForm() {
@@ -527,6 +534,10 @@ class App {
 
     this.#workouts.splice(this.#currentWorkout.workoutIndex, 1);
     this._setWorkoutsToLocalStorage();
+
+
+    // Toggle the human workout
+    this.#workouts.length === 0 && this._toggleEmptyContainer();
   }
 
   // Delete All Workouts
@@ -537,6 +548,8 @@ class App {
     
     this.#workouts = [];
     this._setWorkoutsToLocalStorage();
+
+    this._toggleEmptyContainer();
   }
 
   // Delete Current Workout Animation
@@ -574,6 +587,17 @@ class App {
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
+
+
+    // Toggle the empty message guy
+    this.#workouts.length === 0 && this._toggleElevationField();
+  }
+
+
+  // Toggle Emptyy Container 
+  _toggleEmptyContainer(){
+    document.querySelector(".empty-container").classList.toggle("hidden");
+    document.querySelector(".sidebar__buttons").classList.toggle("hidden");
   }
 }
 

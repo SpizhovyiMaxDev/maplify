@@ -67,6 +67,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     margin-bottom: 4rem;
+    pointer-events: auto;
   }
   
   .sidebar__button {
@@ -183,12 +184,15 @@
     transition: all 0.5s, transform 1ms;
   }
   
-  .form.hidden {
+  .form.hidden,
+  .empty-container.hidden,
+  .sidebar__buttons.hidden {
     transform: translateY(-30rem);
     height: 0;
     padding: 0 2.25rem;
     margin-bottom: 0;
     opacity: 0;
+    pointer-events: none;
   }
 
   .form-workout.hidden {
@@ -391,6 +395,36 @@
     padding: 1rem 2rem;
   }
 }
+
+/* Empty container */
+.empty-container{
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  pointer-events: none;
+}
+
+.empty-image{
+  width: 50%;
+  height: 50%;
+  position: absolute;
+  top:0;
+  left: 0;
+}
+
+.empty-container::before{
+  content: "Create a workout, all you have to do is just click on the map";
+  position: absolute;
+  top:0;
+  right: 10%;
+  width: 40%;
+  font-size: 1.6rem;
+  display: inline-block;
+  background-color: var(--color-light--2);
+  padding: 4rem;
+  border-radius: 11px;
+}
+
 
 @media (max-width:60em){
   .layout {
