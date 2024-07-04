@@ -4,31 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <meta name = "description" content = "Create your own workout" />
 
+    <!--Description Of The Website-->
+    <meta name = "description" content = "Mapty // Effortlessly create and manage your workouts with our intuitive app" />
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!--Fonts-->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" />
+    </noscript>
 
+    <!--Styles-->
     <link rel="stylesheet" href="style.css" />
 
-    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" /> -->
+    <link rel="icon" href="./img/icon.png" />
+    <link rel="apple-touch-icon" href="./img/apple-touch-icon.png" /> 
+    <link rel="manifest" href="manifest.webmanifest" />
 
+    <!--App Color-->
+    <meta name="theme-color" content="#3c9977" />
+
+    <!--Leaflet Library Refrences-->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
     <script async src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
-    
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
     <script async src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
     <script async src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     
+    <!--Script-->
     <script defer src="script.js"></script>
 
-    <title>Mapty // Map your workouts</title>
+    <!--Title-->
+    <title>Mapty // Effortlessly create and manage your workouts with our intuitive app</title>
   </head>
   <body>
     <div class="layout">
@@ -39,11 +47,11 @@
        </h2>
 
        <div class="empty-container hidden">
-        <img src="./person.webp" alt = "Human" class="empty-image"/>
+        <img src="./img/person.webp" alt = "Human" class="empty-image"/>
        </div>
 
       <div class="sidebar__buttons">
-        <button class="sidebar__button sidebar__button--delete-workout active">Delete</button>
+        <button class="sidebar__button sidebar__button--delete-workout disable">Delete</button>
         <button class="sidebar__button sidebar__button--delete-all">Delete All</button>
         <button class="sidebar__button sidebar__button--zoom-all">Show All</button>
         <button class="sidebar__button sidebar__button--my-position">My Position</button>

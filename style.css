@@ -199,8 +199,9 @@
     pointer-events: none;
   }
 
-  .sidebar__button--delete-workout.active{
+  .sidebar__button--delete-workout.disable{
     background: #a83939;
+    cursor: not-allowed;
   }
 
   .form-workout.hidden {
