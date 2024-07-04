@@ -367,6 +367,8 @@ class App {
 
       this._scrollToMarker(workout.coords);
 
+      this._toggleDeleteActive();
+
     } else {
 
       this._deleteCurrentWorkoutAnimation();
@@ -376,6 +378,8 @@ class App {
       this._clearMap("hideRoute");
 
       this._resetCurrentWorkout();
+
+      this._toggleDeleteActive();
     }
   }
 
@@ -464,8 +468,8 @@ class App {
     if(type === "entireMap"){
       this.#markers.map(marker => this.#map.removeLayer(marker));
       
-      if(this.#currentWorkout.mapEventsIndex) { 
-        this.__clearRoutsFromTheMap();
+      if (this.#currentWorkout.mapEventsIndex !== null) { 
+        this._clearAnimationsFromTheMap();
       }
 
       this.#circles = [];
@@ -538,6 +542,8 @@ class App {
 
     // Toggle the human workout
     this.#workouts.length === 0 && this._toggleEmptyContainer();
+
+    this._toggleDeleteActive();
   }
 
   // Delete All Workouts
@@ -550,6 +556,9 @@ class App {
     this._setWorkoutsToLocalStorage();
 
     this._toggleEmptyContainer();
+
+    //When delete all of the workuts, if workout selected and
+    this.#currentWorkout.workout !== null && this._toggleDeleteActive();
   }
 
   // Delete Current Workout Animation
@@ -590,7 +599,7 @@ class App {
 
 
     // Toggle the empty message guy
-    this.#workouts.length === 0 && this._toggleElevationField();
+    this.#workouts.length === 0 && this._toggleEmptyContainer();
   }
 
 
@@ -598,6 +607,11 @@ class App {
   _toggleEmptyContainer(){
     document.querySelector(".empty-container").classList.toggle("hidden");
     document.querySelector(".sidebar__buttons").classList.toggle("hidden");
+  }
+
+  // Toggle delete button
+  _toggleDeleteActive(){
+    document.querySelector(".sidebar__button--delete-workout").classList.toggle("active");
   }
 }
 
