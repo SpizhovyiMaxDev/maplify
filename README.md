@@ -1,6 +1,6 @@
 # Maplify JavaScript Project
 
--------------⚙️ Mapty Features ----------------
+-------------⚙️ Maplify Features ----------------
 
 --> 🏃‍♂️ 🚴‍♀️ Record and visualize outdoor workouts on a map.
 
