@@ -76,16 +76,16 @@ class App {
   #mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
-  #circles = [];
-  #routes = [];
   #markers = [];
   #userCoords;
+
+  #circle = null;
+  #route = null;
 
 
   #currentWorkout = {
     workout:null,
     workoutIndex: null,
-    mapEventsIndex:null,
   };
   
   constructor() {
@@ -116,7 +116,7 @@ class App {
     btnShowAllWorkouts.addEventListener('click', this._showAllWorkouts.bind(this));
   
     //Close the form 
-    btnCloseForm.addEventListener('click', this._hideFormManually.bind(this));
+    btnCloseForm.addEventListener('click', this._onCloseForm.bind(this));
   }
 
   _getPosition() {
@@ -174,12 +174,14 @@ class App {
     userCircle.addTo(this.#map);
   }
 
-  _hideFormManually(e){
+  _onCloseForm(e){
     e.preventDefault();
-    this._hideForm();
 
-    // Toggle the empty message guy
-    this.#workouts.length === 0 && this._toggleEmptyContainer();
+    // Hide Form For The View
+    this._hideForm();
+  
+    // Instead Display Empty Message Preview
+    this.#workouts.length === 0 && this._showEmptyPreview();
   }
 
   _showForm(mapE) {
@@ -187,12 +189,11 @@ class App {
     form.classList.remove('hidden');
     inputDistance.focus();
 
+    // Scroll to form component on a smaller  screens 
+    window.innerWidth <= 958 && form.scrollIntoView({behavior:"smooth"});
 
-    // For the smaller screens scroller
-    window.innerWidth <= 958 && form.scrollIntoView({behavior:"smooth"})
-
-    // Toggle the empty message guy
-    this.#workouts.length === 0 && this._toggleEmptyContainer();
+    // Display Buttons
+    this.#workouts.length === 0 && this._showSetOfButtons();
   }
 
   _hideForm() {
@@ -340,11 +341,11 @@ class App {
 
   _moveToPopup(e) {
     if (!this.#map) return;
+    
     const workoutEl = e.target.closest('.workout');
-
     if (!workoutEl)return;
 
-    const workoutIndex = this.#workouts.findIndex(
+    const workoutIndex = this.#workouts?.findIndex(
       work => work.id === workoutEl.dataset.id
     );
 
@@ -352,36 +353,43 @@ class App {
     if (!workout) return;
 
     if (workout.id !== this.#currentWorkout.workout?.id) {
+      
+      // Clear Map in case it has activated route
+      this._clearMap("deleteRoute");
 
+      // Deactivate selected workout
+      this._deactivateSelectedWorkout();
+
+      // Draw on a map current workout component
       this._animateCurrentWorkout(workoutEl, workout);
 
-      const mapEventsIndex = this.#circles.findIndex(
-        entity => entity.id === workout.id
-      );
-
+      // Define current workout 
       this.#currentWorkout = {
         workout,
         workoutIndex,
-        mapEventsIndex,
       };
 
+      // Scroll To Workout Position
       this._scrollToMarker(workout.coords);
 
+      // Activate Button Delete Workout
       this._activateButtonDelete();
       
     } else {
+      // Deactivate selected workout
+      this._deactivateSelectedWorkout();
 
-      this._deleteCurrentWorkoutAnimation();
+      // Scroll To User Position 
+      this._scrollToUserPostion();
 
-      this._scrollToMarker(this.#userCoords);
+      // Simply Deletes a Route on A Map
+      this._clearMap("deleteRoute");
 
-      this._clearMap("hideRoute");
-
+      // Set Back #currentWorkout to null
       this._resetCurrentWorkout();
  
-     this._deactivateButtonDelete()
+     this._deactivateButtonDelete();
     }
-
   }
 
   _scrollToMarker(coords){
@@ -393,57 +401,36 @@ class App {
     });
   }
 
-  _animateCurrentWorkout(workoutEl, workout){
-    this._deleteCurrentWorkoutAnimation();
+  _animateCurrentWorkout(workoutEl){
     workoutEl.classList.add('current--workout');
     
-    this._animateCircle(workout);
-    this._animateLineRoute(workout);
+    // create circle
+    this.#circle = L.circle(workout.coords, {
+      radius: 120,
+      color: 'red',
+      fillOpacity:0.2
+     });
+
+
+    // create route to workout
+    this.#route = L.Routing.control({
+      waypoints: [
+          L.latLng(this.#userCoords),
+          L.latLng(workout.coords)
+      ],
+      show: false,
+      addWaypoints: false,
+    });
+
+    // Add shapes to the map 
+    this.#circle.addTo(this.#map);
+    this.#route.addTo(this.#map);
   }
 
   _arrNotIncludesId(arr, id){
     return arr.every(el => el.id !== id);
   }
 
-  _animateCircle(workout){
-    const circle = L.circle(workout.coords, {
-      radius: 120,
-      color: 'red',
-      fillOpacity:0.2
-     });
-
-     circle.id = workout.id;
-
-    if(this._arrNotIncludesId(this.#circles, workout.id)){
-      this.#circles.push(circle);
-    }
-
-    this.#circles.forEach(circle => {
-      circle.id === workout.id ? circle.addTo(this.#map) : this.#map.removeLayer(circle)
-    });
-  }
-
-
-   _animateLineRoute(workout){
-    const route = L.Routing.control({
-        waypoints: [
-            L.latLng(this.#userCoords),
-            L.latLng(workout.coords)
-        ],
-        show: false,
-        addWaypoints: false,
-      });
-
-      route.id = workout.id;
-
-      if(this._arrNotIncludesId(this.#routes, route.id)){
-        this.#routes.push(route);
-      }
-
-      this.#routes.forEach(route => {
-        route.id === workout.id ? route.addTo(this.#map) : route.remove()
-      });
-   }
 
   _closeEditForm(e){
      if(e.key === 'Escape'){
@@ -451,38 +438,35 @@ class App {
      }
   }
 
-  // Clear map according to conditions
+  // Clear map 
   _clearMap(type = ""){
-    if(type === "deleteRoute") {
-      this.#map.removeLayer(this.#markers[this.#currentWorkout.workoutIndex])
-      this._clearAnimationsFromTheMap();
-      
-      this.#markers.splice(this.#currentWorkout.workoutIndex, 1);
-      this.#circles.splice(this.#currentWorkout.mapEventsIndex, 1);
-      this.#routes.splice(this.#currentWorkout.mapEventsIndex, 1);
-    }
+    const marker = this.#markers[this.#currentWorkout.workoutIndex];
 
-    if(type === "hideRoute"){
-      this._clearAnimationsFromTheMap();
-    }
-
-    if(type === "entireMap"){
-      this.#markers.map(marker => this.#map.removeLayer(marker));
-      
-      if (this.#currentWorkout.mapEventsIndex !== null) { 
-        this._clearAnimationsFromTheMap();
+    if(type === "deleteRoute"){ 
+      if(this.#circle && this.#route){
+        this.#map.removeLayer(this.#circle);
+        this.#route.remove();
       }
 
-      this.#circles = [];
-      this.#markers = [];
-      this.#routes = [];
+      this.#circle = null;
+      this.#route = null;
+    } else {
+      this.#map.removeLayer(marker);
+
+      if(this.#circle && this.#route){
+        this.#map.removeLayer(this.#circle);
+        this.#route.remove();
+      }
+
+      if (type === "entireMap") {
+        this.#markers = [];
+      }      
+
+      this.#circle = null;
+      this.#route = null;
     }
   }
 
-  _clearAnimationsFromTheMap(){
-    this.#map.removeLayer(this.#circles[this.#currentWorkout.mapEventsIndex]);
-    this.#routes[this.#currentWorkout.mapEventsIndex].remove();
-  }
 
   // This function responsible for setting up all of the workout markers
   _showAllWorkouts(){
@@ -524,26 +508,28 @@ class App {
   _deleteCurrentWorkout() {
     if (this.#currentWorkout.workoutIndex === null) return;
 
-    this._scrollToMarker(this.#userCoords);
+    this._scrollToUserPostion();
 
-    this._deleteCurrentWorkoutView(this.#currentWorkout.workout.id);
+    // Delete workout from sidebar
+    this._deleteSelected(this.#currentWorkout.workout.id);
 
-    this._clearMap("deleteRoute");
+    // Delete workout marker on map
+    this._clearMap("deleteMarker");
 
     this._resetCurrentWorkout();
   }
 
-  _deleteCurrentWorkoutView(id){
+  _deleteSelected(id){
     const workoutElement = document.querySelector(`.workout[data-id="${id}"]`);
     containerWorkouts.removeChild(workoutElement);
 
     this.#workouts.splice(this.#currentWorkout.workoutIndex, 1);
     this._setWorkoutsToLocalStorage();
 
+    // Show Empty Message
+    this.#workouts.length === 0 && this._showEmptyPreview();
 
-    // Toggle the human workout
-    this.#workouts.length === 0 && this._toggleEmptyContainer();
-
+    // Deactivate button that deletes workout
     this._deactivateButtonDelete();
   }
 
@@ -553,26 +539,24 @@ class App {
     document.querySelectorAll(".workout").forEach(work => containerWorkouts.removeChild(work));
     this._clearMap("entireMap");
     
+ 
     this.#workouts = [];
     this._setWorkoutsToLocalStorage();
 
-    this._toggleEmptyContainer();
 
-    //When delete all of the workuts, if workout selected and
-   this._deactivateButtonDelete();
+    this._showEmptyPreview();
+
+    this._deactivateButtonDelete();
   }
 
-  // Delete Current Workout Animation
-  _deleteCurrentWorkoutAnimation(){
+  _deactivateSelectedWorkout(){
     document.querySelectorAll('.workout').forEach(work => work.classList.remove('current--workout'));
   }
 
-  // Delete All workouts from the view
   _deleteAllWorkoutsView(){
     document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));
   }
 
-  // Button Delete Functionality
   _activateButtonDelete(){
     document.querySelector(".sidebar__button--delete-workout").classList.remove("disable");
   }
@@ -580,12 +564,12 @@ class App {
   _deactivateButtonDelete(){
     document.querySelector(".sidebar__button--delete-workout").classList.add("disable");
   }
+
   // Reset current workout
   _resetCurrentWorkout(){
     this.#currentWorkout = {
       workout: null,
       workoutIndex: null,
-      mapEventsIndex:null,
     };
   }
 
@@ -597,7 +581,6 @@ class App {
   // Get from storage workouts, and set them as a current once
   _getWorkoutsLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
-
     if (!data) return;
 
     this.#workouts = data;
@@ -607,14 +590,18 @@ class App {
     });
 
 
-    // Toggle the empty message guy
-    this.#workouts.length === 0 && this._toggleEmptyContainer();
+    this.#workouts.length === 0 ? this._showEmptyPreview() : this._showSetOfButtons();
   }
 
   // Toggle Emptyy Container 
-  _toggleEmptyContainer(){
-    document.querySelector(".empty-container").classList.toggle("hidden");
-    document.querySelector(".sidebar__buttons").classList.toggle("hidden");
+  _showEmptyPreview(){
+    document.querySelector(".empty-container").classList.remove("hidden");
+    document.querySelector(".sidebar__buttons").classList.add("hidden");
+  }
+
+  _showSetOfButtons(){
+    document.querySelector(".empty-container").classList.add("hidden");
+    document.querySelector(".sidebar__buttons").classList.remove("hidden");
   }
 }
 
