@@ -107,7 +107,7 @@ class App {
     btnShowUserPosition.addEventListener('click', this._scrollToUserPostion.bind(this));
 
     // Sort workouts
-    btnSortWorkouts.addEventListener('change', this._setSortedWorkouts.bind(this));
+    btnSortWorkouts.addEventListener('change', this._sortWorkouts.bind(this));
 
     // Remove current element
     btnDeleteWorkout.addEventListener('click', this._deleteCurrentWorkout.bind(this));
@@ -345,6 +345,7 @@ class App {
     const workoutEl = e.target.closest('.workout');
     if (!workoutEl)return;
 
+    
     const workoutIndex = this.#workouts?.findIndex(
       work => work.id === workoutEl.dataset.id
     );
@@ -356,20 +357,21 @@ class App {
       // On a mobile screens, scroll to top instantly
       window.innerWidth <= 958 && window.scrollTo({ top: 0, behavior: "smooth" });
       
-      // Clear Map in case it has activated route
+      // Clear Map in case it has activated route, we set up a new one
       this._clearMap("deleteRoute");
-
-      // Deactivate selected workout
-      this._deactivateSelectedWorkout();
-
-      // Draw on a map current workout component
-      this._animateCurrentWorkout(workoutEl, workout);
 
       // Define current workout 
       this.#currentWorkout = {
+        workoutEl,
         workout,
         workoutIndex,
       };
+
+      // Deactivate selected workout animation
+      this._deactivateSelectedWorkout();
+
+      // Draw on a map current workout component
+      this._animateCurrentWorkout(workoutEl);
 
       // Scroll To Workout Position
       this._scrollToMarker(workout.coords);
@@ -378,7 +380,7 @@ class App {
       this._activateButtonDelete();
       
     } else {
-      // Deactivate selected workout
+      // Deactivate selected workout animation
       this._deactivateSelectedWorkout();
 
       // Scroll To User Position 
@@ -387,10 +389,14 @@ class App {
       // Simply Deletes a Route on A Map
       this._clearMap("deleteRoute");
 
-      // Set Back #currentWorkout to null
-      this._resetCurrentWorkout();
- 
-     this._deactivateButtonDelete();
+      // Reset Parameters of the current workout
+      this.#currentWorkout = {
+        workout: null,
+        workoutIndex: null,
+      };
+
+      // Deactivate button that deletes workouts
+      this._deactivateButtonDelete();
     }
   }
 
@@ -403,11 +409,11 @@ class App {
     });
   }
 
-  _animateCurrentWorkout(workoutEl, workout){
+  _animateCurrentWorkout(workoutEl){
     workoutEl.classList.add('current--workout');
     
     // create circle
-    this.#circle = L.circle(workout.coords, {
+    this.#circle = L.circle(this.#currentWorkout.workout.coords, {
       radius: 120,
       color: 'red',
       fillOpacity:0.2
@@ -418,7 +424,7 @@ class App {
     this.#route = L.Routing.control({
       waypoints: [
           L.latLng(this.#userCoords),
-          L.latLng(workout.coords)
+          L.latLng(this.#currentWorkout.workout.coords)
       ],
       show: false,
       addWaypoints: false,
@@ -434,12 +440,11 @@ class App {
     const marker = this.#markers[this.#currentWorkout.workoutIndex];
 
     // Remove circle and route from map
-    (() => {
-        if (this.#circle) this.#map.removeLayer(this.#circle);
-        if (this.#route) this.#route.remove();
-        this.#circle = null;
-        this.#route = null;
-    })();
+    if (this.#circle) this.#map.removeLayer(this.#circle);
+    if (this.#route) this.#route.remove();
+    this.#circle = null;
+    this.#route = null;
+
 
     // if we delete the route, we just keep it
     if (type === "deleteRoute") return;
@@ -458,24 +463,20 @@ class App {
     }
   }
 
-  // This function responsible for setting up all of the workout markers
+  // Scroll Map Functions
   _showAllWorkouts(){
     if(this.#markers.length > 0)
         this.#map.fitBounds(L.featureGroup(this.#markers).getBounds());
   }
 
-   // Go to the cuurent user position
    _scrollToUserPostion(){
     this.#map.setView(this.#userCoords, this.#mapZoomLevel, {animate:true, pan:{duration:1}});
    }
 
    // Sort workouts
-   _setSortedWorkouts(e){
-     let option = e.target.value;
-     this._sortWorkouts(option);
-   }
+   _sortWorkouts(e){
+    let option = e.target.value;
 
-   _sortWorkouts(option){
     this._deleteAllWorkoutsView();
     
     const sortOpitions = {
@@ -506,7 +507,11 @@ class App {
     // Delete workout marker on map
     this._clearMap("deleteMarker");
 
-    this._resetCurrentWorkout();
+    // Reset Parameters of the current workout
+    this.#currentWorkout = {
+      workout: null,
+      workoutIndex: null,
+    };
   }
 
   _deleteSelectedWorkout(id){
@@ -532,17 +537,23 @@ class App {
  
     this.#workouts = [];
     this._setWorkoutsToLocalStorage();
-
-
+    
+    // Display Message
     this._showEmptyPreview();
 
+    // Deactivate button delete all workouts
     this._deactivateButtonDelete();
+
+    // Hide form in case it is open
+    !form.classList.contains("hidden") && this._hideForm();
   }
 
+  // Delete Animation from the workout
   _deactivateSelectedWorkout(){
     document.querySelectorAll('.workout').forEach(work => work.classList.remove('current--workout'));
   }
 
+  // Delete All Workouts From the Sidebar
   _deleteAllWorkoutsView(){
     document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));
   }
@@ -555,13 +566,6 @@ class App {
     document.querySelector(".sidebar__button--delete-workout").classList.add("disable");
   }
 
-  // Reset current workout
-  _resetCurrentWorkout(){
-    this.#currentWorkout = {
-      workout: null,
-      workoutIndex: null,
-    };
-  }
 
   // Storage Workouts 
   _setWorkoutsToLocalStorage() {
@@ -583,7 +587,7 @@ class App {
     this.#workouts.length === 0 ? this._showEmptyPreview() : this._showSetOfButtons();
   }
 
-  // Toggle Emptyy Container 
+  // Empty Container && Buttons View
   _showEmptyPreview(){
     document.querySelector(".empty-container").classList.remove("hidden");
     document.querySelector(".sidebar__buttons").classList.add("hidden");
