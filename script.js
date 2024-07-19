@@ -1,4 +1,5 @@
-'use strict';
+
+import { nanoid } from 'nanoid'
 
 class Workout {
   date = new Date();
@@ -75,10 +76,9 @@ class App {
   #map;
   #mapZoomLevel = 13;
   #mapEvent;
+  #userCoords;
   #workouts = [];
   #markers = [];
-  #userCoords;
-
   #circle = null;
   #route = null;
 
@@ -353,6 +353,8 @@ class App {
     if (!workout) return;
 
     if (workout.id !== this.#currentWorkout.workout?.id) {
+      // On a mobile screens, scroll to top instantly
+      window.innerWidth <= 958 && window.scrollTo({ top: 0, behavior: "smooth" });
       
       // Clear Map in case it has activated route
       this._clearMap("deleteRoute");
@@ -427,13 +429,6 @@ class App {
     this.#route.addTo(this.#map);
   }
 
-
-  _closeEditForm(e){
-     if(e.key === 'Escape'){
-      form.classList.add('hidden');
-     }
-  }
-
   // Clear map 
   _clearMap(type = "") {
     const marker = this.#markers[this.#currentWorkout.workoutIndex];
@@ -447,8 +442,13 @@ class App {
     })();
 
     // if we delete the route, we just keep it
-    if (type === "deleteRoute")  return;
+    if (type === "deleteRoute") return;
   
+    // Delete Marker
+    if(type === "deleteMarker"){
+      this.#markers.splice(this.#currentWorkout.workoutIndex, 1);
+    }
+
 
     if (type === "entireMap") {
         this.#markers.forEach(marker => this.#map.removeLayer(marker));
@@ -501,7 +501,7 @@ class App {
     this._scrollToUserPostion();
 
     // Delete workout from sidebar
-    this._deleteSelected(this.#currentWorkout.workout.id);
+    this._deleteSelectedWorkout(this.#currentWorkout.workout.id);
 
     // Delete workout marker on map
     this._clearMap("deleteMarker");
@@ -509,7 +509,7 @@ class App {
     this._resetCurrentWorkout();
   }
 
-  _deleteSelected(id){
+  _deleteSelectedWorkout(id){
     const workoutElement = document.querySelector(`.workout[data-id="${id}"]`);
     containerWorkouts.removeChild(workoutElement);
 

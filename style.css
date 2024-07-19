@@ -30,6 +30,11 @@
     font-size: 1.8rem;
   }
   
+  select{
+    -webkit-appearance: none;
+    -moz-appearance: none; 
+  }
+
   .layout{ 
     display: grid;
     grid-template-columns: 1fr 3fr;
@@ -216,7 +221,7 @@
   .form__row {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
   }
   
   .form__row--hidden {
@@ -247,21 +252,26 @@
   }
   
   .form__btn {
-    font-size: 1.8rem; /* Increased font size for better readability */
-    padding: 1.2rem 2rem; /* Increased padding for a larger button */
-    margin: 1.5rem 0;
-    background: linear-gradient(135deg, #ffb545, #ff9f00); /* Gradient background */
+    width: 100%;
+    font-size: 1.8rem; 
+    padding: 1.2rem 2rem; 
+    background: linear-gradient(135deg, #ffb545, #ff9f00); 
     color: var(--color-dark--1);
-    border-radius: 5px; /* Slightly larger border radius */
+    border-radius: 5px; 
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a 3D effect */
-    transition: all 0.3s ease; /* Smooth transition effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    transition: all 0.3s ease; 
   }
   
   .form__btn:hover {
-    background: linear-gradient(135deg, #ff9f00, #e68a00); /* Darker gradient on hover */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* Slightly larger shadow on hover */
+    background: linear-gradient(135deg, #ff9f00, #e68a00); 
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .form__btns{
+    display: flex;
+    gap:2.4rem;
   }
 
   .tips{
@@ -368,10 +378,6 @@
     font-size: 50%;
   }
 
-  .form__btn--add{
-    margin: 3rem 0 0;
-  }
-  
   .layout {
     grid-template-columns: 1fr 2fr;
   }
