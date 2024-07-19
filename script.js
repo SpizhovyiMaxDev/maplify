@@ -427,10 +427,6 @@ class App {
     this.#route.addTo(this.#map);
   }
 
-  _arrNotIncludesId(arr, id){
-    return arr.every(el => el.id !== id);
-  }
-
 
   _closeEditForm(e){
      if(e.key === 'Escape'){
