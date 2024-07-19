@@ -401,7 +401,7 @@ class App {
     });
   }
 
-  _animateCurrentWorkout(workoutEl){
+  _animateCurrentWorkout(workoutEl, workout){
     workoutEl.classList.add('current--workout');
     
     // create circle
@@ -439,34 +439,28 @@ class App {
   }
 
   // Clear map 
-  _clearMap(type = ""){
+  _clearMap(type = "") {
     const marker = this.#markers[this.#currentWorkout.workoutIndex];
 
-    if(type === "deleteRoute"){ 
-      if(this.#circle && this.#route){
-        this.#map.removeLayer(this.#circle);
-        this.#route.remove();
-      }
+    // Remove circle and route from map
+    (() => {
+        if (this.#circle) this.#map.removeLayer(this.#circle);
+        if (this.#route) this.#route.remove();
+        this.#circle = null;
+        this.#route = null;
+    })();
 
-      this.#circle = null;
-      this.#route = null;
-    } else {
-      this.#map.removeLayer(marker);
+    // if we delete the route, we just keep it
+    if (type === "deleteRoute")  return;
+  
 
-      if(this.#circle && this.#route){
-        this.#map.removeLayer(this.#circle);
-        this.#route.remove();
-      }
-
-      if (type === "entireMap") {
+    if (type === "entireMap") {
+        this.#markers.forEach(marker => this.#map.removeLayer(marker));
         this.#markers = [];
-      }      
-
-      this.#circle = null;
-      this.#route = null;
+    } else {
+        this.#map.removeLayer(marker);
     }
   }
-
 
   // This function responsible for setting up all of the workout markers
   _showAllWorkouts(){
