@@ -174,7 +174,7 @@ class App {
 
   _onCloseForm(e){
     e.preventDefault();
-
+    
     // Hide Form For The View
     this._hideForm();
   
@@ -193,6 +193,7 @@ class App {
     // Display Buttons
     this.#workouts.length === 0 && this._showSetOfButtons();
   }
+
 
   _hideForm() {
     inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value =
@@ -287,8 +288,11 @@ class App {
 
 
   _renderWorkout(workout) {
+    const { time, unit } = this._formatTime(workout.duration);
+    const current = this.#currentWorkout.workout?.id === workout.id ? "current--workout" : "";
+
     let html = `
-      <li class="workout workout--${workout.type} ${this.#currentWorkout.workout?.id === workout.id ? "current--workout" : ""}" data-id="${workout.id}">
+      <li class="workout workout--${workout.type} ${current}" data-id="${workout.id}">
         <h2 class="workout__title">${workout.description}</h2>
         <div class="workout__details">
           <span class="workout__icon">${
@@ -299,8 +303,8 @@ class App {
         </div>
         <div class="workout__details">
           <span class="workout__icon">⏱</span>
-          <span class="workout__value">${workout.duration}</span>
-          <span class="workout__unit">min</span>
+          <span class="workout__value">${time}</span>
+          <span class="workout__unit">${unit}</span>
         </div>
     `;
 
@@ -337,6 +341,14 @@ class App {
     form.insertAdjacentHTML('afterend', html);
   }
 
+  _formatTime(duration){
+    if(duration >= 60){
+      return { time: Math.floor(duration / 60), unit: "hr" };
+    } else {
+      return { time:duration, unit:"min" }
+    }
+  }
+
   _moveToPopup(e) {
     if (!this.#map) return;
     
@@ -356,7 +368,7 @@ class App {
       window.innerWidth <= 958 && window.scrollTo({ top: 0, behavior: "smooth" });
       
       // Clear Map in case it has activated route, we set up a new one
-      this._clearMap("deleteRoute");
+      this._clearMap("hideRoute");
 
       // Define current workout 
       this.#currentWorkout = {
@@ -382,10 +394,10 @@ class App {
       this._deactivateSelectedWorkout();
 
       // Scroll To User Position 
-      this._scrollToUserPostion();
+      this._scrollToMarker(this.#userCoords);
 
       // Simply Deletes a Route on A Map
-      this._clearMap("deleteRoute");
+      this._clearMap("hideRoute");
 
       // Reset Parameters of the current workout
       this.#currentWorkout = {
@@ -398,14 +410,6 @@ class App {
     }
   }
 
-  _scrollToMarker(coords){
-    this.#map.setView(coords, this.#mapZoomLevel, {
-      animate: true,
-      pan: {
-        duration: 1,
-      },
-    });
-  }
 
   _animateCurrentWorkout(workoutEl){
     workoutEl.classList.add('current--workout');
@@ -445,23 +449,19 @@ class App {
 
 
     // if we delete the route, we just keep it
-    if (type === "deleteRoute") return;
-  
-    // Delete Marker
-    if(type === "deleteMarker"){
-      this.#markers.splice(this.#currentWorkout.workoutIndex, 1);
-    }
-
-
+    if (type === "hideRoute") return;
+    
+    
     if (type === "entireMap") {
-        this.#markers.forEach(marker => this.#map.removeLayer(marker));
-        this.#markers = [];
+      this.#markers.forEach(marker => this.#map.removeLayer(marker));
+      this.#markers = [];
     } else {
-        this.#map.removeLayer(marker);
+      this.#map.removeLayer(marker);
+      this.#markers.splice(this.#currentWorkout.workoutIndex, 1);
     }
   }
 
-  // Scroll Map Functions
+  // Scroll Functions
   _showAllWorkouts(){
     if(this.#markers.length > 0)
         this.#map.fitBounds(L.featureGroup(this.#markers).getBounds());
@@ -471,11 +471,20 @@ class App {
     this.#map.setView(this.#userCoords, this.#mapZoomLevel, {animate:true, pan:{duration:1}});
    }
 
+   _scrollToMarker(coords){
+    this.#map.setView(coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1,
+      },
+    });
+  }
+
    // Sort workouts
    _sortWorkouts(e){
     let option = e.target.value;
 
-    this._deleteAllWorkoutsView();
+    this._deleteSidebarWorkouts();
     
     const sortOpitions = {
       "Sort By Lowest Distance": (a, b) => b.distance  -  a.distance,
@@ -497,7 +506,8 @@ class App {
   _deleteCurrentWorkout() {
     if (this.#currentWorkout.workoutIndex === null) return;
 
-    this._scrollToUserPostion();
+    // Scroll to user position
+    this._scrollToMarker(this.#userCoords);
 
     // Delete workout from sidebar
     this._deleteSelectedWorkout(this.#currentWorkout.workout.id);
@@ -528,10 +538,12 @@ class App {
 
   // Delete All Workouts
   _deleteAllWorkouts(){
-    this._scrollToUserPostion();
-    document.querySelectorAll(".workout").forEach(work => containerWorkouts.removeChild(work));
-    this._clearMap("entireMap");
+    // Scrioll to user position
+    this._scrollToMarker(this.#userCoords);
     
+    this._deleteSidebarWorkouts();
+
+    this._clearMap("entireMap");
  
     this.#workouts = [];
     this._setWorkoutsToLocalStorage();
@@ -552,7 +564,7 @@ class App {
   }
 
   // Delete All Workouts From the Sidebar
-  _deleteAllWorkoutsView(){
+  _deleteSidebarWorkouts(){
     document.querySelectorAll('.workout').forEach(work => containerWorkouts.removeChild(work));
   }
 
