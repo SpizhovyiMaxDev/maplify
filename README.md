@@ -1,21 +1,19 @@
 # Maplify JavaScript Project
 
--------------⚙️ Maplify Features ----------------
+### • 🏃‍♂️ 🚴‍♀️ Record and visualize outdoor workouts on a map.
 
---> 🏃‍♂️ 🚴‍♀️ Record and visualize outdoor workouts on a map.
+### • 🗺️ Different workout types (e.g., running, cycling) with duration and distance.
 
---> 🗺️ Different workout types (e.g., running, cycling) with duration and distance.
+### • 📍 Track workout locations and timestamps.
 
---> 📍 Track workout locations and timestamps.
+### • 📊 View fitness progress with charts and graphs.
 
---> 📊 View fitness progress with charts and graphs.
+### • 📋 Store and search workout history.
 
-📋 Store and search workout history.
+### • 🗑️ Delete unwanted workouts.
 
-🗑️ Delete unwanted workouts.
+### • 📏 Sort workouts by distance.
 
-📏 Sort workouts by distance.
+### • 🌍 Show all workouts on the map simultaneously, regardless of location.
 
-🌍 Show all workouts on the map simultaneously, regardless of location.
-
-🧭 Scroll to the user's current position on the map.
+### • 🧭 Scroll to the user's current position on the map.
