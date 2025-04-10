@@ -10,7 +10,7 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 
 ## Features
 
-	•	🏃‍♂️ 🚴‍♀️ Track Workouts on Map: Record and visualize your running and cycling sessions interactively.
+	• 🏃‍♂️ 🚴‍♀️ Track Workouts on Map: Record and visualize your running and cycling sessions interactively.
  
 	•	🗺️ Workout Types: Log workouts by type, duration, and distance.
  
@@ -33,15 +33,15 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 ## Instalation instructions for learning purposes 
 
 
-1.Clone repository:
+1. Clone repository:
 
 ```bash
 git clone https://github.com/SpizhovyiMaxDev/maplify.git
 ```
 
-2.Open index.html in your browser.
+2. Open index.html in your browser.
 
-3.Allow location access when prompted
+3. Allow location access when prompted
 
 No build tools, no setup—just open and use!
 
@@ -51,7 +51,7 @@ No build tools, no setup—just open and use!
 
 1. Clone the repo and open it in your editor.
  
-2.The logic is modular and organized using JavaScript ES6 classes:
+2. The logic is modular and organized using JavaScript ES6 classes:
  
 	•	Workout (base class)
  
@@ -59,9 +59,9 @@ No build tools, no setup—just open and use!
  
 	•	App (manages UI, map, state, and events) 
  
-3.Leaflet and Leaflet Routing Machine are used for map and route rendering.
+3. Leaflet and Leaflet Routing Machine are used for map and route rendering.
  
-4.Easily extend features or tweak the UI—no frameworks involved.
+4. Easily extend features or tweak the UI—no frameworks involved.
 
 
  ## Contributor Expectations
