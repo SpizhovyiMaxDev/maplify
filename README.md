@@ -42,7 +42,7 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 
 3. Allow location access when prompted
 
-No build tools, no setup—just open and use!
+👉 No build tools, no setup—just open and use!
 
 
 
