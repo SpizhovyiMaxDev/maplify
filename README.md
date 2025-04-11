@@ -78,7 +78,7 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 
  ## Known Issues
  
-   • Local-only data (via localStorage)—not synced across devices.
+   • Local-only data (localStorage)—not synced across devices.
  
    • Limited mobile optimization for very small screen sizes.
  
