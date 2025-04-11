@@ -6,7 +6,7 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 ## Introduction 
 
 **Maplify** is a sleek, interactive web application that helps you log, visualize, and manage your running and cycling workouts on a real-time map. Built entirely with **vanilla JavaScript** (no frameworks!) and **Leaflet.js** for geolocation and map rendering, Maplify provides a responsive and intuitive interface for fitness tracking—right in the browser.
-
+<br>
 
 ## Features
 
@@ -28,7 +28,7 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
  
 • 🧭 User Locator: Instantly scroll to your current position on the map.
 
-
+<br>
 
 ## Instalation instructions for learning purposes 
 
@@ -61,7 +61,7 @@ No build tools, no setup—just open and use!
 3. Leaflet and Leaflet Routing Machine are used for map and route rendering.
  
 4. Easily extend features or tweak the UI—no frameworks involved.
-
+<br>
 
  ## Contributor Expectations
  
@@ -74,7 +74,7 @@ No build tools, no setup—just open and use!
    • Follow consistent code style.
  
    • Test your changes and submit a detailed pull request.
-
+<br>
 
  ## Known Issues
  
@@ -83,7 +83,7 @@ No build tools, no setup—just open and use!
    • Limited mobile optimization for very small screen sizes.
  
    • No offline functionality yet.
-
+<br>
 
 ## Respect the Work
 
