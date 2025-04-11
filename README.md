@@ -52,11 +52,11 @@ No build tools, no setup—just open and use!
  
 2. The logic is modular and organized using JavaScript ES6 classes:
  
- • Workout (base class)
+    • Workout (base class)
    
- • Running and Cycling (subclasses)
+    • Running and Cycling (subclasses)
  
- • App (manages UI, map, state, and events) 
+    • App (manages UI, map, state, and events) 
  
 3. Leaflet and Leaflet Routing Machine are used for map and route rendering.
  
@@ -65,24 +65,24 @@ No build tools, no setup—just open and use!
 
  ## Contributor Expectations
  
-• Stick with vanilla JavaScript (no React, Vue, etc.)
+   • Stick with vanilla JavaScript (no React, Vue, etc.)
  
-• Keep code clean and modular.
+   • Keep code clean and modular.
  
-• Comment complex logic.
+   • Comment complex logic.
  
-• Follow consistent code style.
+   • Follow consistent code style.
  
-• Test your changes and submit a detailed pull request.
+   • Test your changes and submit a detailed pull request.
 
 
  ## Known Issues
  
-• Local-only data (via localStorage)—not synced across devices.
+   • Local-only data (via localStorage)—not synced across devices.
  
-• Limited mobile optimization for very small screen sizes.
+   • Limited mobile optimization for very small screen sizes.
  
-• No offline functionality yet.
+   • No offline functionality yet.
 
 
 ## Respect the Work
