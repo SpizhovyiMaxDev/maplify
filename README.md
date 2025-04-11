@@ -32,12 +32,11 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 
 ## Instalation instructions for learning purposes 
 
-
 1. Clone repository:
 
- ```bash
- git clone https://github.com/SpizhovyiMaxDev/maplify.git
- ```
+  ```bash
+  git clone https://github.com/SpizhovyiMaxDev/maplify.git
+  ```
 
 2. Open index.html in your browser.
 
