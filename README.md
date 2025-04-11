@@ -35,9 +35,9 @@ Track your outdoor workouts with precision—powered by Leaflet.js and pure Java
 
 1. Clone repository:
 
-```bash
-git clone https://github.com/SpizhovyiMaxDev/maplify.git
-```
+ ```bash
+ git clone https://github.com/SpizhovyiMaxDev/maplify.git
+ ```
 
 2. Open index.html in your browser.
 
@@ -53,11 +53,11 @@ No build tools, no setup—just open and use!
  
 2. The logic is modular and organized using JavaScript ES6 classes:
  
-• Workout (base class)
+ • Workout (base class)
    
-• Running and Cycling (subclasses)
+ • Running and Cycling (subclasses)
  
-• App (manages UI, map, state, and events) 
+ • App (manages UI, map, state, and events) 
  
 3. Leaflet and Leaflet Routing Machine are used for map and route rendering.
  
